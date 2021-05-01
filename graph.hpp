@@ -47,7 +47,23 @@ public:
     _adj_list.insert(std::make_pair(val, list_type()));
   }
 
-  void remove_vertex(const VertexType &val) { _adj_list.erase(val); }
+  void remove_vertex(const VertexType &val) {
+    if (_adj_list.find(val) == _adj_list.end()) {
+      return;
+    }
+
+    _adj_list.erase(val);
+
+    for (int i = 1; i < _adj_list.size(); ++i) {
+      list_type adj = _adj_list.at(i);
+      if (adj.empty())
+        continue;
+
+      if (adj.find(val) != adj.end()) {
+        adj.erase(val);
+      }
+    }
+  }
 
   /**
    * @brief Menambahkan edge baru dari 2 vertex
@@ -58,13 +74,11 @@ public:
   void add_edge(const VertexType &val1, const VertexType val2) {
     list_type &adj1 = _adj_list.at(val1), &adj2 = _adj_list.at(val2);
 
-    auto it = adj1.find(val2);
-    if (it == adj1.end()) {
+    if (adj1.find(val2) == adj1.end()) {
       adj1.insert(val2);
     }
 
-    it = adj2.find(val1);
-    if (it == adj2.end()) {
+    if (adj2.find(val1) == adj2.end()) {
       adj2.insert(val1);
     }
   }
